@@ -20,7 +20,7 @@ export const VoteButtons: React.FC<VoteButtonsProps> = ({ proposalId, onVote, di
       <Button 
         onClick={() => onVote(proposalId, true)} 
         variant="outline"
-        className="border-green-400 hover:bg-green-50 hover:text-green-600 flex-1"
+        className="border-green-400 hover:bg-green-50 hover:text-green-600 flex-1 transition-all duration-200"
         disabled={disabled}
       >
         <CheckIcon className="mr-1 h-4 w-4" />
@@ -29,7 +29,7 @@ export const VoteButtons: React.FC<VoteButtonsProps> = ({ proposalId, onVote, di
       <Button 
         onClick={() => onVote(proposalId, false)} 
         variant="outline" 
-        className="border-red-400 hover:bg-red-50 hover:text-red-600 flex-1"
+        className="border-red-400 hover:bg-red-50 hover:text-red-600 flex-1 transition-all duration-200"
         disabled={disabled}
       >
         <XIcon className="mr-1 h-4 w-4" />
@@ -53,12 +53,12 @@ export const VotingProgress: React.FC<VotingProgressProps> = ({ votesFor, votesA
     <div className="space-y-2">
       <div className="flex justify-between text-sm">
         <span>{t('votingProgress')}</span>
-        <span>{totalVotes} votes</span>
+        <span className="font-medium">{totalVotes} {t('votes')}</span>
       </div>
-      <Progress value={forPercentage} className="h-2" />
+      <Progress value={forPercentage} className="h-2 transition-all duration-300" />
       <div className="flex justify-between text-xs text-muted-foreground">
-        <span>{t('votesFor')}: {votesFor}</span>
-        <span>{t('votesAgainst')}: {votesAgainst}</span>
+        <span className="text-green-600">{t('votesFor')}: {votesFor}</span>
+        <span className="text-red-600">{t('votesAgainst')}: {votesAgainst}</span>
       </div>
     </div>
   );
@@ -80,10 +80,22 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   const { t } = useLanguage();
   
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden hover:shadow-md transition-all duration-300 animate-scale-in">
       <div className="p-6">
-        <h3 className="text-lg font-semibold mb-2">{title}</h3>
-        <p className="text-sm text-muted-foreground mb-4">{description}</p>
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="text-lg font-semibold">{title}</h3>
+          {isActive ? (
+            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+              {t('active')}
+            </span>
+          ) : (
+            <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full">
+              {t('completed')}
+            </span>
+          )}
+        </div>
+        
+        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{description}</p>
         
         <div className="space-y-4">
           <VotingProgress votesFor={votesFor} votesAgainst={votesAgainst} />
@@ -91,8 +103,8 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           {isActive ? (
             <VoteButtons proposalId={id} onVote={onVote} />
           ) : (
-            <div className="bg-muted p-2 text-center rounded-md text-sm">
-              {t('votingResults')}: {votesFor > votesAgainst ? t('approve') : t('reject')}
+            <div className={`p-2 text-center rounded-md text-sm font-medium ${votesFor > votesAgainst ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+              {t('votingResults')}: {votesFor > votesAgainst ? t('approved') : t('rejected')}
             </div>
           )}
         </div>

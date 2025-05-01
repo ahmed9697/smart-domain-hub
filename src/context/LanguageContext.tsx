@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
 type Language = 'en' | 'ar';
@@ -109,6 +108,20 @@ const translations = {
     healthcare: "Healthcare",
     management: "Management",
     custom: "Custom",
+    
+    // New translations
+    votes: "votes",
+    approved: "Approved",
+    rejected: "Rejected",
+    filterByDomain: "Filter by Domain",
+    allDomains: "All Domains",
+    selectDomain: "Select Domain",
+    noProposalsFound: "No active proposals found",
+    noCompletedProposalsFound: "No completed proposals found",
+    voteRecordedFor: "Your vote has been recorded: Approved",
+    voteRecordedAgainst: "Your vote has been recorded: Rejected",
+    newProposalsAvailable: "New proposals are available for voting",
+    completed: "Completed"
   },
   ar: {
     // Common
@@ -201,6 +214,20 @@ const translations = {
     healthcare: "الرعاية الصحية",
     management: "الإدارة",
     custom: "مخصص",
+    
+    // New translations
+    votes: "أصوات",
+    approved: "تمت الموافقة",
+    rejected: "تم الرفض",
+    filterByDomain: "تصفية حسب المجال",
+    allDomains: "جميع المجالات",
+    selectDomain: "اختر المجال",
+    noProposalsFound: "لا توجد مقترحات نشطة",
+    noCompletedProposalsFound: "لا توجد مقترحات مكتملة",
+    voteRecordedFor: "تم تسجيل صوتك: موافق",
+    voteRecordedAgainst: "تم تسجيل صوتك: رفض",
+    newProposalsAvailable: "تتوفر مقترحات جديدة للتصويت",
+    completed: "مكتمل"
   }
 };
 
