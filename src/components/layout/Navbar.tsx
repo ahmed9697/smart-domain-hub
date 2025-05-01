@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from 'react-router-dom';
+import { Badge } from "@/components/ui/badge";
+import { toast } from 'sonner';
 
 const Navbar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
@@ -20,6 +22,15 @@ const Navbar: React.FC = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  
+  // مركز الإشعارات المحسن
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: 'New proposal created', time: '2 minutes ago', read: false },
+    { id: 2, title: 'Your reward was claimed', time: '1 hour ago', read: false },
+    { id: 3, title: 'Domain updated', time: '3 hours ago', read: true },
+  ]);
+  
+  const unreadCount = notifications.filter(n => !n.read).length;
   
   // إضافة تأثير الظهور التدريجي للبحث
   const toggleSearch = () => {
@@ -35,9 +46,24 @@ const Navbar: React.FC = () => {
     if (e.key === 'Enter' && searchQuery) {
       // يمكننا إضافة وظيفة بحث حقيقية هنا
       console.log('Searching for:', searchQuery);
+      toast.success(t('searchStarted') + ': ' + searchQuery);
       setSearchQuery('');
       setShowSearch(false);
     }
+  };
+  
+  // قراءة الإشعارات
+  const markAsRead = (id: number) => {
+    setNotifications(notifications.map(n => 
+      n.id === id ? {...n, read: true} : n
+    ));
+    toast.info(t('notificationRead'));
+  };
+  
+  // قراءة كل الإشعارات
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(n => ({...n, read: true})));
+    toast.success(t('allNotificationsRead'));
   };
   
   return (
@@ -76,9 +102,10 @@ const Navbar: React.FC = () => {
             variant="ghost" 
             size="icon" 
             onClick={toggleSearch} 
-            className="hover:bg-accent"
+            className="hover:bg-accent relative"
           >
             <Search size={20} />
+            <span className="sr-only">{t('search')}</span>
           </Button>
 
           {/* Theme Toggle */}
@@ -86,16 +113,21 @@ const Navbar: React.FC = () => {
             variant="ghost" 
             size="icon" 
             onClick={toggleTheme}
-            className="hover:bg-accent transition-colors duration-200"
+            className="hover:bg-accent transition-colors duration-300"
           >
-            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            {theme === 'light' ? 
+              <Sun size={20} className="transition-transform duration-500 hover:rotate-45" /> : 
+              <Moon size={20} className="transition-transform duration-500 hover:rotate-12" />
+            }
+            <span className="sr-only">{t('toggleTheme')}</span>
           </Button>
           
           {/* Language Switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="hover:bg-accent">
-                <Languages size={20} />
+                <Languages size={20} className="transition-transform duration-300 hover:rotate-180" />
+                <span className="sr-only">{t('changeLanguage')}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="animate-scale-in">
@@ -113,21 +145,51 @@ const Navbar: React.FC = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="hover:bg-accent relative">
                 <Bell size={20} />
-                <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+                {unreadCount > 0 && (
+                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                    {unreadCount}
+                  </Badge>
+                )}
+                <span className="sr-only">{t('notifications')}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80 animate-scale-in">
               <div className="p-4">
-                <h3 className="font-medium text-sm">{t('notifications')}</h3>
-                <div className="mt-2 space-y-2">
-                  <div className="p-2 hover:bg-accent rounded-md cursor-pointer transition-colors">
-                    <p className="text-sm font-medium">New proposal created</p>
-                    <p className="text-xs text-muted-foreground">2 minutes ago</p>
-                  </div>
-                  <div className="p-2 hover:bg-accent rounded-md cursor-pointer transition-colors">
-                    <p className="text-sm font-medium">Your reward was claimed</p>
-                    <p className="text-xs text-muted-foreground">1 hour ago</p>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <h3 className="font-medium text-sm">{t('notifications')}</h3>
+                  {unreadCount > 0 && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={markAllAsRead}
+                      className="text-xs h-auto py-1"
+                    >
+                      {t('markAllAsRead')}
+                    </Button>
+                  )}
+                </div>
+                
+                <div className="mt-2 space-y-2 max-h-64 overflow-auto">
+                  {notifications.length > 0 ? (
+                    notifications.map((notification) => (
+                      <div 
+                        key={notification.id}
+                        className={`p-2 hover:bg-accent rounded-md cursor-pointer transition-colors ${
+                          !notification.read ? 'border-l-2 border-primary' : ''
+                        }`}
+                        onClick={() => markAsRead(notification.id)}
+                      >
+                        <p className={`text-sm ${!notification.read ? 'font-medium' : ''}`}>
+                          {notification.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{notification.time}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-4">
+                      <p className="text-sm text-muted-foreground">{t('noNotifications')}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </DropdownMenuContent>
@@ -137,7 +199,8 @@ const Navbar: React.FC = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="hover:bg-accent">
-                <Settings size={20} />
+                <Settings size={20} className="transition-transform duration-500 hover:rotate-90" />
+                <span className="sr-only">{t('settings')}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="animate-scale-in">
@@ -149,7 +212,10 @@ const Navbar: React.FC = () => {
           
           {/* User Profile */}
           <div className="flex items-center">
-            <div className="h-8 w-8 rounded-full bg-brand-light text-white flex items-center justify-center cursor-pointer hover:bg-brand transition-colors">
+            <div 
+              className="h-8 w-8 rounded-full bg-brand-light text-white flex items-center justify-center cursor-pointer hover:bg-brand transition-colors hover:scale-110 duration-300"
+              onClick={() => toast.success(t('profileAction'))}
+            >
               JS
             </div>
           </div>
