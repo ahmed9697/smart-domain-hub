@@ -12,7 +12,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { language } = useLanguage();
   
   return (
-    <div className={`min-h-screen bg-background ${language === 'ar' ? 'font-arabic' : 'font-sans'}`}>
+    <div className={`min-h-screen bg-background ${language === 'ar' ? 'font-arabic rtl' : 'font-sans ltr'}`}>
       <Navbar />
       <div className="flex">
         <Sidebar />

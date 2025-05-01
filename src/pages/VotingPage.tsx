@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useMockData } from '@/context/MockDataContext';
@@ -44,7 +43,15 @@ const VotingPage: React.FC = () => {
   
   // Handlers
   const handleCreateProposal = () => {
-    addProposal(newProposal);
+    // تحديث دالة إضافة المقترح لتتضمن الخصائص المطلوبة
+    const proposalToAdd = {
+      ...newProposal,
+      votesFor: 0,
+      votesAgainst: 0,
+      isActive: true
+    };
+    
+    addProposal(proposalToAdd);
     setIsCreateModalOpen(false);
     setNewProposal({
       domainId: '',
